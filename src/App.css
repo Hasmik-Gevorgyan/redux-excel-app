@@ -46,10 +46,48 @@
   form {
     display: flex;
     gap: 1rem;
+    max-width: 30rem;
+    margin: 0 auto;
   }
   input {
     padding: 0.5rem;
     width: 100%;
   }
 
+}
+
+.color-palette {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}  
+
+.color-box {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.selected-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.selected-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 36rem;
 }

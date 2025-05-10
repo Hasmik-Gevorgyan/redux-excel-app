@@ -1,17 +1,24 @@
 import {createAppSlice} from "../../app/createAppSlice";
-import {fetchRandomNumber} from "./userSliceAPI";
+import {fetchRandomNumber, fetchAllColors, fetchSelectedColor} from "./userSliceAPI";
 
 export type userSliceState = {
   name: string;
-  number: number;
-  status: "idle" | "loading" | "failed";
+  color: string;
+  fetchUserStatus: "idle" | "loading" | "failed";
+  fetchColorsStatus: "idle" | "loading" | "failed";
+  deleteSelectedColorStatus:  "idle" | "loading" | "failed";
+  colorsList: {color: string}[];
 }
 
 const initialState: userSliceState = {
   name: "",
-  number: 0,
-  status: "idle",
-}
+  color: "",
+  fetchUserStatus: "idle",
+  fetchColorsStatus: "idle",
+  deleteSelectedColorStatus: "idle",
+  colorsList: [],
+};
+
 export const userSlice = createAppSlice({
   name: "user",
   initialState,
@@ -20,35 +27,74 @@ export const userSlice = createAppSlice({
       state.name = action.payload as any;
     }),
     setNumber: create.reducer((state, action) => {
-      state.number = action.payload as any;
+      state.color = action.payload as any;
     }),
     fetchUser: create.asyncThunk(
-      async (name: string) => {
-        const response = await fetchRandomNumber(name)
-        // The value we return becomes the `fulfilled` action payload
+      async ({name, selectedColor}: {name: string, selectedColor: string}) => {
+        const response = await fetchRandomNumber(name, selectedColor);
+
         return response;
       },
       {
         pending: state => {
-          state.status = "loading"
+          state.fetchUserStatus = "loading"
         },
         fulfilled: (state, action) => {
-          state.number = action.payload.number
+          state.color = action.payload.color
           state.name = action.payload.name
-          state.status = "idle"
+          state.fetchUserStatus = "idle"
         },
         rejected: state => {
-          state.status = "failed"
+          state.fetchUserStatus = "failed"
         },
+      },
+    ),
+    fetchColors: create.asyncThunk(
+      async () => {
+        const response = await fetchAllColors();
+        
+        return response;
+      },
+      {
+        pending: state => {
+          state.fetchColorsStatus = "loading"
+        },
+        fulfilled: (state, action) => {
+          state.colorsList = action.payload
+          state.fetchColorsStatus = "idle"
+        },
+        rejected: state => {
+          state.fetchColorsStatus = "failed"
+        },
+      },
+    ),
+    deleteSelectedColor: create.asyncThunk(
+      async (id: string) => {
+        await fetchSelectedColor(id)
+        return id;
+      },
+      {
+        pending: state => {
+          state.deleteSelectedColorStatus = "loading"
+        },
+        fulfilled: (state, action) => {
+          state.colorsList = state.colorsList.filter(color => color.color !== action.payload)
+          state.deleteSelectedColorStatus = "idle"
+        },
+        rejected: state => {
+          state.deleteSelectedColorStatus = "failed"
+        }
       },
     ),
   }),
   selectors: {
     selectUser: user => user.name,
-    selectNumber: user => user.number,
-    selectStatus: user => user.status,
+    selectColor: user => user.color,
+    selectfetchColorsStatus: user => user.fetchColorsStatus,
+    selectfetchUserStatus: user => user.fetchUserStatus,
+    selectColorsList: user => user.colorsList,
   },
 })
 
-export const {selectUser, selectNumber, selectStatus} = userSlice.selectors;
-export const {setName, fetchUser} = userSlice.actions;
+export const {selectUser, selectColor, selectfetchUserStatus, selectfetchColorsStatus, selectColorsList} = userSlice.selectors;
+export const {setName, fetchUser, fetchColors, deleteSelectedColor } = userSlice.actions;

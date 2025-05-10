@@ -1,20 +1,25 @@
 import React, { useState } from "react";
 import { AppDispatch } from "../app/store";
 import { useDispatch, useSelector } from "react-redux";
-import {fetchUser, selectNumber, selectStatus, selectUser} from "../features/user/userSlice";
+import {
+    fetchUser,
+    selectColorsList, 
+    deleteSelectedColor
+} from "../features/user/userSlice";
 
-const Form = () => {
+const Form = ({onSubmit}: {onSubmit: () => void}) => {
     const [name, setName] = useState("");
     const dispatch = useDispatch<AppDispatch>();
-    const number = useSelector(selectNumber);
-    const status = useSelector(selectStatus);
-    const nameFromStore = useSelector(selectUser);
-    
+    const colorsList = useSelector(selectColorsList);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (name.trim()) {
-            dispatch(fetchUser(name));
+            const selectedColor = colorsList[Math.floor(Math.random() * colorsList.length)]?.color;
+            dispatch(fetchUser({name, selectedColor}));
+            dispatch(deleteSelectedColor(selectedColor));
             setName("");
+            onSubmit();
         }
     };
 
@@ -26,14 +31,8 @@ const Form = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
                 />
-                <button type="submit">Submit</button>
+                <button type="submit" disabled={!colorsList.length}>Submit</button>
             </form>
-            {status === "loading" ? 
-                <p>Loading...</p>
-            :
-                number !== null && nameFromStore && <p>The data added to the excel ({nameFromStore}, {number})</p>
-            }
-            {/* {number !== null && <p>Your random number: {number}</p>} */}
         </div>
     );
 };
