@@ -17,6 +17,7 @@ function App() {
 
   return (
     <div>
+      <a className='link-to-excel' href='https://docs.google.com/spreadsheets/d/1JkaCNYW-SneyzgiC8ABvRAzvl5OYUvgcmOTIuzxVexY/edit?usp=sharing' target='_blank'>Link to Excel Sheet</a>
       <ColorPalette />
       <div className="selected-container">
         {isUserSelected ? 
